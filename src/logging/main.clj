@@ -46,6 +46,7 @@
              "jetbrains.*"
              "org.apache.http.impl.conn.PoolingHttpClientConnectionManager"
              "org.mongodb.driver.*"
+             "org.eclipse.jetty.*"
              "org.projectodd.wunderboss.web.Web"
              "org.quartz.core.JobRunShell"
              "org.quartz.core.QuartzScheduler"
