@@ -118,7 +118,13 @@
                          :output-fn custom-output-fn))
     (log/debug "Configured Timbre with " (p logging-config))))
 
+(defn init!
+  "Initialize logging with default configuration. Call this early in the application lifecycle."
+  []
+  (configure-logging! config))
+
 ; System.setProperty("org.eclipse.jetty.util.log.class", "org.eclipse.jetty.util.log.StdErrLog");
 ;System.setProperty("org.eclipse.jetty.LEVEL", "OFF");
 
-(configure-logging! config)
+;; Comment out the automatic configuration as it will now be called by the initializer
+;; (configure-logging! config)
