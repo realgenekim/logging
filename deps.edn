@@ -1,16 +1,10 @@
-{:paths ["src" "src/java"]
+{:paths ["src"]
  :deps  {
          ;org.clojure/clojure        {:mvn/version "1.11.1"}
          ;; Unified logging for server
-         ;com.taoensso/timbre                                 {:mvn/version "6.0.4"}
-         com.taoensso/timbre                                 {:mvn/version "5.2.1"}
-         org.slf4j/log4j-over-slf4j                          {:mvn/version "1.7.36"} ; auto sends log4j to slf4j
-         org.slf4j/jul-to-slf4j                              {:mvn/version "1.7.36"} ; auto sends java.util.logging to slf4j
-         org.slf4j/jcl-over-slf4j                            {:mvn/version "1.7.36"} ; auto-sends java.common.logging to slf4j
-         com.fzakaria/slf4j-timbre                           {:mvn/version "0.3.21"}}} ; hooks slf4j to timbre
-         ;com.taoensso/timbre        {:mvn/version "5.0.0"}
-         ;org.slf4j/log4j-over-slf4j {:mvn/version "1.7.30"} ; auto sends log4j to slf4j
-         ;org.slf4j/jul-to-slf4j     {:mvn/version "1.7.30"} ; auto sends java.util.logging to slf4j
-         ;org.slf4j/jcl-over-slf4j   {:mvn/version "1.7.30"} ; auto-sends java.common.logging to slf4j
-         ;com.fzakaria/slf4j-timbre  {:mvn/version "0.3.19"}}} ; hooks slf4j to timbre
+         com.taoensso/timbre        {:mvn/version "5.2.1"}
+         org.slf4j/log4j-over-slf4j {:mvn/version "1.7.30"} ; auto sends log4j to slf4j
+         org.slf4j/jul-to-slf4j     {:mvn/version "1.7.30"} ; auto sends java.util.logging to slf4j
+         org.slf4j/jcl-over-slf4j   {:mvn/version "1.7.30"} ; auto-sends java.common.logging to slf4j
+         com.fzakaria/slf4j-timbre  {:mvn/version "0.3.19"}}} ; hooks slf4j to timbre
 

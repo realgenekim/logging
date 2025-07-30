@@ -3,7 +3,10 @@
     [clojure.string :as str]
     [clojure.pprint :refer [pprint]]
     [taoensso.encore :as enc]
-    [taoensso.timbre :as log]))
+    [taoensso.timbre :as log])
+  (:import
+    [java.time.format DateTimeFormatter]
+    [java.time ZonedDateTime ZoneId]))
 
 
 ; https://stackoverflow.com/questions/2976308/how-do-i-turn-off-logging-in-java-c3p0-connection-pooling-lib
@@ -24,8 +27,8 @@
              "com.mchange.v2.c3p0.*"
              "com.mchange.v2.resourcepool.*"
              "com.mchange.v2.log.*"
-             "com.zaxxer.hikari.pool.HikariPool"
              "com.zaxxer.*"
+             "com.google.cloud.sql.*"
              "com.mchange.v2.c3p0.impl.AbstractPoolBackedDataSource"
              "com.mchange.v2.c3p0.impl.NewPooledConnection"
              "datomic.common"
@@ -43,10 +46,8 @@
              "io.netty.buffer.PoolThreadCache"
              "io.grpc.netty.shaded.io.grpc.netty"
              "io.grpc.netty.shaded.*"
-             "jetbrains.*"
              "org.apache.http.impl.conn.PoolingHttpClientConnectionManager"
              "org.mongodb.driver.*"
-             "org.eclipse.jetty.*"
              "org.projectodd.wunderboss.web.Web"
              "org.quartz.core.JobRunShell"
              "org.quartz.core.QuartzScheduler"
@@ -58,13 +59,14 @@
              "org.quartz.plugins.history.LoggingJobHistoryPlugin"
              "org.quartz.plugins.history.LoggingTriggerHistoryPlugin"
              "org.quartz.utils.UpdateChecker"
-             "shadow.cljs.devtools.server.worker.impl"
-             "org.apache.http.client.*"}
+             "shadow.cljs.devtools.server.worker.impl"}
      :allow #{"*"}}
     :min-level
     [[#{"taoensso.*"} :info]
      ["org.mongodb.driver.*" :error]
      ["com.example.*" :info]
+     ["com.zaxxer.hikari.pool.HikariPool" :warn]
+     ["com.google.cloud.sql.*" :warn]
      ["*" :info]]}})
 
 (defmacro p
@@ -91,6 +93,12 @@
                                 v))
                             args)))))
 
+(defn local-timestamp-fn []
+  "Returns a formatted timestamp string in local timezone"
+  (let [formatter (DateTimeFormatter/ofPattern "yyyy-MM-dd'T'HH:mm:ss.SSSZ")]
+    (.format (ZonedDateTime/now (ZoneId/systemDefault)) formatter)))
+
+
 (defn custom-output-fn
   "Derived from Timbre's default output function. Used server-side."
   ([data] (custom-output-fn nil data))
@@ -99,7 +107,9 @@
          {:keys [level ?err msg_ ?ns-str ?file timestamp_ ?line]} data]
      (format "%1.1S %s %20s:-%3s - %s%s"
        (name level)
-       (force timestamp_)
+       ;(force timestamp_)
+       ; always output in local timezone
+       (local-timestamp-fn)
        (str/replace-first (or ?ns-str ?file "?") "com.fulcrologic." "_")
        (or ?line "?")
        (force msg_)
@@ -112,19 +122,15 @@
   "Configure clojure logging for this project. `config` is the global config map that should contain
   `:taoensso.timbre/logging-config` as a key."
   [config]
+  (log/warn ::CONFIGURING-LOGGING!)
   (let [{:keys [taoensso.timbre/logging-config]} config]
     (log/merge-config! (assoc logging-config
                          :middleware [(pretty-middleware #(with-out-str (pprint %)))]
                          :output-fn custom-output-fn))
     (log/debug "Configured Timbre with " (p logging-config))))
 
-(defn init!
-  "Initialize logging with default configuration. Call this early in the application lifecycle."
-  []
-  (configure-logging! config))
-
 ; System.setProperty("org.eclipse.jetty.util.log.class", "org.eclipse.jetty.util.log.StdErrLog");
 ;System.setProperty("org.eclipse.jetty.LEVEL", "OFF");
 
-;; Comment out the automatic configuration as it will now be called by the initializer
-;; (configure-logging! config)
+(do
+  (configure-logging! config))
